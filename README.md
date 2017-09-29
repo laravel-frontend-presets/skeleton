@@ -1,20 +1,6 @@
-Use this repo as a skeleton for your new preset, once you're done please open an issue on [this repo](https://github.com/laravel-frontend-presets/internals).
+# Laravel 5.5.x Front-end Preset For
 
-Here's the latest documentation on Laravel 5.5:
-
-https://laravel.com/docs/master/
-
-# A Boilerplate repo for presets
-
-This package makes it easy to use [:preset-name](:link-to-website) with Laravel 5.5+.
-
-**Note:** Replace ```:preset-name```, ```:link-to-website```, ```:author-name``` and ```:author-username``` on this file, and then delete this line.
-
-**Note:** Make sure you replace all the instances of the word ```skeleton``` or ```Skeleton``` on this file, the `composer.json` file and on the `src/` folder, and to rename the files. You can delete this line after.
-
-This is where your description should go. Add a little code example so build can understand real quick how the package can be used. Try and limit it to a paragraph or two.
-
-
+This package makes it easy to use [Polymer 2.x starter kit (webpack version)](https://github.com/Banno/polymer-2-starter-kit-webpack) with Laravel 5.5+.
 
 ## Contents
 
@@ -30,7 +16,25 @@ This is where your description should go. Add a little code example so build can
 To install this preset on your laravel application, simply run:
 
 ``` bash
-composer require laravel-frontend-presets/skeleton
+composer require jlndk/laravel-polymer-webpack-frontend-preset
+```
+
+In Laravel 5.5+ this package should be discovered automaticly, but if you for some reason want to register it manually add this line to the service provider array in `config/app.php`.
+```php
+Jlndk\PolymerWebpackPreset\PolymerPresetServiceProvider::class,
+```
+
+## Usage
+**Notice: It is only recommended to run this package once and only on a fresh laravel installation. It is not our responserbility if you loose existing data.**
+
+This package ships with two presets. One without authentication scaffolding, and one with.
+To use the one without simply run:
+```bash
+php artisan preset polymer
+```
+To use the one with authentication scaffolding run:
+```bash
+php artisan preset polymer-auth
 ```
 
 ## Contributing
@@ -39,7 +43,7 @@ Please check our contributing rules in [our website](https://laravel-frontend-pr
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Jonas Lindenskov Nielsen (jlndk)](https://github.com/jlndk)
 - [All Contributors](../../contributors)
 
 ## License
