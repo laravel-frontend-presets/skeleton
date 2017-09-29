@@ -1,4 +1,4 @@
-# Laravel 5.5.x Front-end Preset For
+# Laravel 5.5.x front-end preset for Polymer
 
 This package makes it easy to use [Polymer 2.x starter kit (webpack version)](https://github.com/Banno/polymer-2-starter-kit-webpack) with Laravel 5.5+.
 
