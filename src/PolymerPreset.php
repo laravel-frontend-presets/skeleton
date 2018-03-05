@@ -98,7 +98,9 @@ class PolymerPreset extends Preset
         $packagesToRemove = [
             'jquery',
             'bootstrap-sass',
+            'bootstrap',
             'laravel-mix',
+            'vue'
         ];
 
         return $packagesToAdd + Arr::except($packages, $packagesToRemove);
@@ -167,7 +169,23 @@ class PolymerPreset extends Preset
             $filesystem->copy(__DIR__.'/polymer-stubs/views/app.blade.php', resource_path('views/app.blade.php'));
         });
     }
+    
+    /**
+     * Update the authentication views.
+     *
+     * @return void
+     */
+    protected static function addAuthViews()
+    {
+        tap(new Filesystem, function ($filesystem) {
+            // Add App controller
+            $filesystem->copy(__DIR__.'/polymer-stubs/Controllers/AppController.php', app_path('Http/Controllers/AppController.php'));
 
+            // Copy Skeleton auth views from the stubs folder
+            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/views/auth', resource_path('views/auth'));
+        });
+    }
+    
     /**
      * Update routes for the SPA without authentication.
      *
@@ -182,22 +200,6 @@ class PolymerPreset extends Preset
             }
 
             $filesystem->copy(__DIR__.'/polymer-stubs/routes/web.php', base_path('routes/web.php'));
-        });
-    }
-
-    /**
-     * Update the authentication views.
-     *
-     * @return void
-     */
-    protected static function addAuthViews()
-    {
-        tap(new Filesystem, function ($filesystem) {
-            // Add App controller
-            $filesystem->copy(__DIR__.'/polymer-stubs/Controllers/AppController.php', app_path('Http/Controllers/AppController.php'));
-
-            // Copy Skeleton auth views from the stubs folder
-            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/views/auth', resource_path('views/auth'));
         });
     }
 
