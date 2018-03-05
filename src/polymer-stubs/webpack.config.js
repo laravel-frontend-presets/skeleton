@@ -6,9 +6,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
-    entry: [
-        './resources/assets/elements/my-app.html'
-    ],
+    entry: {
+        my: './resources/assets/elements/my-app.html'
+    },
     output: {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, './public/dist'),

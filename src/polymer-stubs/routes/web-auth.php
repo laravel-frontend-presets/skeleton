@@ -13,6 +13,8 @@
 
 //REGISTER ALL ROUTES THAT SHOULD NOT BE SEND TO THE SPA HERE!!!
 
+Auth::routes();
+
 /*
 |--------------------------------------------------------------------------
 | Single page application

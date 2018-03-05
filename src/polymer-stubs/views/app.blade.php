@@ -63,7 +63,7 @@
         document.addEventListener('WebComponentsReady', function webcomponentsready() {
             var refScript = document.getElementsByTagName('script')[0];
             var script = document.createElement('script');
-            script.src = 'dist/main.bundle.js';
+            script.src = 'dist/{{$app_name}}.bundle.js';
             script.defer = true;
             refScript.parentNode.insertBefore(script, refScript);
             document.removeEventListener('WebComponentsReady', webcomponentsready, false);
@@ -73,6 +73,9 @@
     <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
     <script src="dist/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             font-family: 'Roboto', 'Noto', sans-serif;
@@ -84,7 +87,7 @@
 </head>
 
 <body>
-    <my-app></my-app>
+    <{{$app_name}}-app></{{$app_name}}-app>
     <noscript>
       Please enable JavaScript to view this website.
     </noscript>

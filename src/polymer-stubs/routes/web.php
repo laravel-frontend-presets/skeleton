@@ -24,5 +24,7 @@
 |
 */
 Route::get('/{all?}', function () {
-    return view('app');
+    return view('app', [
+        'app_name' => 'my'
+    ]);
 })->where(['all' => '.*'])->name('app');
