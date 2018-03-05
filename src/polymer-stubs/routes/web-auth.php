@@ -13,7 +13,23 @@
 
 //REGISTER ALL ROUTES THAT SHOULD NOT BE SEND TO THE SPA HERE!!!
 
-Auth::routes();
+
+/*
+|--------------------------------------------------------------------------
+| Authentication routes
+|--------------------------------------------------------------------------
+|
+| These routes will handle user login and registration functionality.
+| This group replaces the default Auth::routes() route group, since other
+| urls are used instead.
+|
+*/
+Route::group(['prefix' => 'auth', 'middleware' => ['guest']], function() {
+    Route::get('/{all?}', 'Auth\SinglePageLoginController@index')->where(['all' => '.*'])->name('auth');
+});
+//Preserve original url's by setting up redirects.
+Route::redirect('/login', '/auth/login');
+Route::redirect('/logout', '/auth/logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +37,8 @@ Auth::routes();
 |--------------------------------------------------------------------------
 |
 | This route catches all requests and routes it to the Singe Page Application.
-| If you want routes that is not send to the SPA, register them above this
-| route.
+| If you want routes that is not send to the SPA, register in the top of 
+| this file.
 |
 */
 Route::get('/{all?}', 'AppController@index')->where(['all' => '.*'])->name('app');
