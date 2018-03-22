@@ -7,7 +7,8 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
     entry: {
-        my: './resources/assets/elements/my/my-app.html'
+        my: './resources/assets/elements/my/my-app.html',
+        auth: './resources/assets/elements/auth/auth-app.html'
     },
     output: {
         filename: '[name].bundle.js',

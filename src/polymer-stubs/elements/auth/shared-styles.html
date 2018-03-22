@@ -1,0 +1,61 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared/global-styles.html">
+
+<!-- shared styles for all views -->
+<dom-module id="shared-styles">
+    <template>
+        <style include="global-styles">
+            :host {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding-top: 5vh;
+            }
+
+            .card {
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+                justify-content: center;
+                width: 100vw;
+                padding: 25px;
+            }
+
+            /* Reset text alignment for text input */
+            paper-input {
+                text-align: left;
+            }
+
+            paper-checkbox {
+                margin: 15px;
+                align-self: left;
+            }
+
+            h1 {
+                font-size: 40px;
+                margin: 0;
+            }
+
+            .error {
+                color: #dd2c00;
+            }
+
+            paper-button.signin-default {
+                margin: 20px 0;
+                background-color: #3498db;
+                color: white;
+            }
+
+            paper-button iron-icon {
+                width: 30px;
+                margin-left: -15px;
+            }
+
+            @media(min-width: 600px) {
+                .card {
+                    width: 400px;
+                }
+            }
+        </style>
+    </template>
+</dom-module>

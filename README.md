@@ -19,15 +19,15 @@ To install this preset on your laravel application, simply run:
 composer require jlndk/laravel-polymer-webpack-frontend-preset
 ```
 
-In Laravel 5.5+ this package should be discovered automaticly, but if you for some reason want to register it manually add this line to the service provider array in `config/app.php`.
+In Laravel 5.5+ this package should be discovered automatically, but if you for some reason want to register it manually add this line to the service provider array in `config/app.php`.
 ```php
 Jlndk\PolymerWebpackPreset\PolymerPresetServiceProvider::class,
 ```
 
 ## Usage
-**Notice: It is only recommended to run this package once and only on a fresh laravel installation. It is not our responserbility if you loose existing data.**
+**Notice: It is only recommended to run this package once and only on a fresh laravel installation. It is not our responsibility if you loose existing data.**
 
-This package ships with two presets. One without authentication scaffolding, and one with.
+This package ships with two presets. One with authentication scaffolding specifically made for laravel, and one without.
 To use the one without simply run:
 ```bash
 php artisan preset polymer

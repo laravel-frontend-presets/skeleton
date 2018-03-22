@@ -1,0 +1,21 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="auth-view-404">
+    <template>
+        <style include="shared-styles"></style>
+
+        <div class="card">
+            <h1>404</h1>
+            Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+        </div>
+    </template>
+
+    <script>
+        class AuthView404 extends Polymer.Element {
+            static get is() { return 'auth-view-404'; }
+        }
+
+        window.customElements.define(AuthView404.is, AuthView404);
+    </script>
+</dom-module>

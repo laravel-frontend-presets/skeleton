@@ -27,16 +27,15 @@ class PolymerPresetServiceProvider extends ServiceProvider
             $command->comment('Please run "npm install && bower install && npm run dev" to compile your fresh scaffolding.');
         });
 
-        //@TODO: Add auth routes
-        // PresetCommand::macro('polymer-auth', function ($command) {
-        //     PolymerPreset::install(true);
-        //
-        //     if ($command->confirm($this->newRouteMessage)) {
-        //         PolymerPreset::updateAuthRoutes();
-        //     }
-        //
-        //     $command->info('Polymer scaffolding with Auth views installed successfully.');
-        //     $command->comment('Please run "npm install && bower install && npm run dev" to compile your fresh scaffolding.');
-        // });
+        PresetCommand::macro('polymer-auth', function ($command) {
+            PolymerPreset::install(true);
+
+            if ($command->confirm($this->newRouteMessage)) {
+                PolymerPreset::updateAuthRoutes();
+            }
+
+            $command->info('Polymer scaffolding with Auth views installed successfully.');
+            $command->comment('Please run "npm install && bower install && npm run dev" to compile your fresh scaffolding.');
+        });
     }
 }

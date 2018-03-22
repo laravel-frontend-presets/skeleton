@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="generator" content="Polymer Starter Kit">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
     <title>My App</title>
@@ -40,6 +39,10 @@
     <meta name="msapplication-TileColor" content="#3f51b5">
     <meta name="msapplication-tap-highlight" content="no">
 
+    <noscript class="lazyload">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet">
+    </noscript>
+
     <script>
         // Register the base URL
         const baseUrl = document.querySelector('base').href;
@@ -52,23 +55,43 @@
         }
     </script>
     <script>
-        if (window.fetch) {
+        function addLazyScript(path, defer = false) {
             var refScript = document.getElementsByTagName('script')[0];
             var script = document.createElement('script');
-            script.src = 'dist/bower_components/webcomponentsjs/custom-elements-es5-adapter.js';
+            script.src = path;
+            script.defer = defer;
             refScript.parentNode.insertBefore(script, refScript);
+        }
+
+        function lazyLoadStyles() {
+            const lazyloads = document.querySelectorAll('noscript.lazyload');
+
+            // This container is the HTML parser
+            const container = document.createElement('div');
+
+            Array.from(lazyloads).forEach(lazyload => {
+                const parent = lazyload.parentNode;
+
+                container.innerHTML = lazyload.textContent;
+
+                Array.from(container.children)
+                .forEach(n =>
+                    parent.insertBefore(n, lazyload)
+                );
+            });
         }
     </script>
     <script>
-        document.addEventListener('WebComponentsReady', function webcomponentsready() {
-            var refScript = document.getElementsByTagName('script')[0];
-            var script = document.createElement('script');
-            script.src = 'dist/{{$app_name}}.bundle.js';
-            script.defer = true;
-            refScript.parentNode.insertBefore(script, refScript);
-            document.removeEventListener('WebComponentsReady', webcomponentsready, false);
-        }, false);
+        window.addEventListener('load', function() {
+            addLazyScript('dist/{{$app_name}}.bundle.js', true);
+            lazyLoadStyles();
+        });
     </script>
+    @if(isset($config) && is_array($config))
+    <script>
+        window.App = {!!json_encode($config)!!}
+    </script>
+    @endif
 
     <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
     <script src="dist/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
@@ -77,8 +100,8 @@
             box-sizing: border-box;
         }
         body {
+            font-family: 'Source Sans Pro', sans-serif;
             margin: 0;
-            font-family: 'Roboto', 'Noto', sans-serif;
             line-height: 1.5;
             min-height: 100vh;
             background-color: #eeeeee;

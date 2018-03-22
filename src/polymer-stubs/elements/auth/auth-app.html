@@ -1,0 +1,144 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../shared/offline-toast.html">
+<link rel="import" href="../shared/app-icons.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="auth-app">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                background-color: var(--app-primary-color);
+                height: 100vh;
+            }
+        </style>
+
+        <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
+        <app-route
+        route="{{route}}"
+        pattern="[[rootPath]]:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+
+        <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="404">
+            <auth-view-login
+                name="login"
+                route="[[subroute]]">
+            </auth-view-login>
+            <auth-view-register
+                name="register"
+                route="[[subroute]]">
+            </auth-view-register>
+            <auth-view-password-forgot
+                name="password-forgot"
+                route="[[subroute]]">
+            </auth-view-password-forgot>
+            <auth-view-password-reset
+                name="password-reset"
+                route="[[subroute]]">
+            </auth-view-password-reset>
+            <auth-view-404
+                name="404"
+                route="[[subroute]]">
+            </auth-view-404>
+        </iron-pages>
+
+        <offline-toast></offline-toast>
+    </template>
+
+    <script>
+        class AuthApp extends Polymer.Element {
+
+            static get is() {
+                return 'auth-app';
+            }
+
+            static get properties() {
+                return {
+                    page: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged',
+                    },
+                    routeData: Object,
+                    subroute: String,
+                    rootPath: {
+                        type: String,
+                        value: '/auth/'
+                    },
+                    lazyPages: {
+                        type: Object,
+                        value: {
+                            login: function() {
+                                import ( /* webpackChunkName: "auth-view-login" */ './auth-view-login.html');
+                            },
+                            register: function() {
+                                import ( /* webpackChunkName: "auth-view-register" */ './auth-view-register.html');
+                            },
+                            passwordForgot: function() {
+                                import ( /* webpackChunkName: "auth-view-password-forgot" */ './auth-view-password-forgot.html');
+                            },
+                            passwordReset: function() {
+                                import ( /* webpackChunkName: "auth-view-password-reset" */ './auth-view-password-reset.html');
+                            },
+                            view404: function() {
+                                import ( /* webpackChunkName: "auth-view-404" */ './auth-view-404.html');
+                            }
+                        }
+                    }
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_routePageChanged(routeData.page)',
+                ];
+            }
+
+            ready() {
+                super.ready();
+                window.addEventListener('page-change', this._onPageChange.bind(this));
+            }
+
+            _routePageChanged(page) {
+                // Polymer 2.0 will call with `undefined` on initialization.
+                // Ignore until we are properly called with a string.
+                if (page === undefined) {
+                    return;
+                }
+
+                this.page = page || 'login';
+            }
+
+            _pageChanged(url) {
+                let page = url.replace(/-([a-z])/g, function (m, w) {
+                    return w.toUpperCase();
+                });
+
+                if (this.lazyPages[page]) {
+                    this.lazyPages[page]();
+                } else {
+                    this._showPage404();
+                }
+            }
+
+            _onPageChange(evt) {
+                window.history.pushState({}, null, `${this.rootPath}${evt.detail.page}`);
+                window.dispatchEvent(new CustomEvent('location-changed'));
+            }
+
+            _showPage404() {
+                this.page = 'view404';
+            }
+        }
+
+        window.customElements.define(AuthApp.is, AuthApp);
+    </script>
+</dom-module>

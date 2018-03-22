@@ -15,7 +15,7 @@ class PolymerPreset extends Preset
      */
     public static function install($withAuth = false)
     {
-        static::updatePackages();
+        static::updatePackages($withAuth);
         static::updateSass();
         static::updateBootstrapping();
         static::updateDefaultViews();
@@ -32,13 +32,17 @@ class PolymerPreset extends Preset
      *
      * @return void
      */
-    protected static function updatePackages()
+    protected static function updatePackages($withAuth = false)
     {
         static::updateNodePackages();
         static::updateBowerPackages();
 
         //Move webpack files
-        copy(__DIR__.'/polymer-stubs/webpack.config.js', base_path('webpack.config.js'));
+        if($withAuth) {
+            copy(__DIR__.'/polymer-stubs/webpack.auth.config.js', base_path('webpack.config.js'));
+        } else {
+            copy(__DIR__.'/polymer-stubs/webpack.config.js', base_path('webpack.config.js'));
+        }
     }
 
     /**
@@ -147,7 +151,8 @@ class PolymerPreset extends Preset
                 $filesystem->deleteDirectory(resource_path('assets/elements'));
             }
 
-            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/elements', resource_path('assets/elements'));
+            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/elements/my', resource_path('assets/elements/my'));
+            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/elements/shared', resource_path('assets/elements/shared'));
             $filesystem->copyDirectory(__DIR__.'/polymer-stubs/js', resource_path('assets/js'));
         });
     }
@@ -169,7 +174,7 @@ class PolymerPreset extends Preset
             $filesystem->copy(__DIR__.'/polymer-stubs/views/app.blade.php', resource_path('views/app.blade.php'));
         });
     }
-    
+
     /**
      * Update the authentication views.
      *
@@ -180,12 +185,13 @@ class PolymerPreset extends Preset
         tap(new Filesystem, function ($filesystem) {
             // Add App controller
             $filesystem->copy(__DIR__.'/polymer-stubs/Controllers/AppController.php', app_path('Http/Controllers/AppController.php'));
+            //Add authentication app controller
+            $filesystem->copy(__DIR__.'/polymer-stubs/Controllers/AuthAppController.php', app_path('Http/Controllers/Auth/AppController.php'));
 
-            // Copy Skeleton auth views from the stubs folder
-            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/views/auth', resource_path('views/auth'));
+            $filesystem->copyDirectory(__DIR__.'/polymer-stubs/elements/auth', resource_path('assets/elements/auth'));
         });
     }
-    
+
     /**
      * Update routes for the SPA without authentication.
      *
