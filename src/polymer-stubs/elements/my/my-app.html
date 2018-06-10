@@ -164,7 +164,7 @@
                 window.addEventListener('offline', this._onlineChanged.bind(this));
             }
 
-            _routePageChanged(ur) {
+            _routePageChanged(url) {
                 // Polymer 2.0 will call with `undefined` on initialization.
                 // Ignore until we are properly called with a string.
                 if (url === undefined) {
