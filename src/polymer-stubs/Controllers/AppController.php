@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
+class AppController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -17,12 +18,17 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * Show the application.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return view('home');
+        return view('app', [
+            'app_name' => 'my',
+            'config' => [
+                'csrf_token' => csrf_token()
+            ]
+        ]);
     }
 }

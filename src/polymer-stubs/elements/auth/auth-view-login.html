@@ -1,0 +1,235 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="auth-view-login">
+    <template>
+        <style include="shared-styles">
+            a {
+                text-align: left;
+            }
+        </style>
+
+        <div class="card sharp shadow-strong">
+            <h1>Login</h1>
+            <p class="error">{{globalError}}</p>
+            <paper-input
+                type="text"
+                label="Email"
+                value="{{email}}"
+                disabled="[[disabled]]"
+                error-message="{{emailError}}"
+                invalid="[[emailInvalid]]"
+                autofocus
+                on-keyup="_onInputKeyup">
+            </paper-input>
+            <paper-input
+                type="password"
+                label="Password"
+                value="{{password}}"
+                disabled="[[disabled]]"
+                error-message="{{passwordError}}"
+                invalid="[[passwordInvalid]]"
+                on-keyup="_onInputKeyup">
+            </paper-input>
+            <a href="/auth/password-forgot">Forgot your password?</a>
+            <paper-checkbox
+                checked="{{remember}}"
+                disabled="[[disabled]]">
+                Remember me
+            </paper-checkbox>
+
+            <paper-button class="signin-default"
+                raised
+                disabled="[[disabled]]"
+                on-tap="_onSignInButtonTap">
+                [[loginButtonText]]
+            </paper-button>
+
+            <paper-button
+                raised
+                disabled="[[disabled]]"
+                on-tap="_onRegisterButtonTap">
+                Register new account
+            </paper-button>
+        </div>
+    </template>
+
+    <script>
+        import axios from '../../js/axios.js';
+
+        class AuthViewLogin extends Polymer.Element {
+            static get is() { return 'auth-view-login'; }
+
+            static get properties() {
+                return {
+                    email: {
+                        type: String
+                    },
+                    emailError: {
+                        type: String
+                    },
+                    emailInvalid: {
+                        type: Boolean,
+                        computed: '_computeInvalid(emailError)'
+                    },
+
+                    password: {
+                        type: String
+                    },
+                    passwordError: {
+                        type: String
+                    },
+                    passwordInvalid: {
+                        type: Boolean,
+                        computed: '_computeInvalid(passwordError)'
+                    },
+
+                    remember: {
+                        type: Boolean,
+                        value: false
+                    },
+
+                    globalError: {
+                        type: String
+                    },
+
+                    loginButtonText: {
+                        type: String,
+                        computed: '_computeLoginButtonText(loading)'
+                    },
+
+                    loading: {
+                        type: Boolean,
+                        value: false
+                    },
+                    offline: {
+                        type: Boolean
+                    },
+                    disabled: {
+                        type: Boolean,
+                        computed: '_computeDisabled(offline, loading)'
+                    }
+                }
+            }
+
+            async submitLogin() {
+                if(!this.validate()) return;
+
+                this.loading = true;
+
+                try {
+                    let response = await axios.post('/auth/login', {
+                        email: this.email,
+                        password: this.password,
+                        remember: this.remember
+                    })
+
+                    document.location = "/";
+                }
+                catch(error) {
+                    this.loading = false;
+                    const response = error.response;
+
+                    const data = typeof response != 'undefined' ? response.data : {};
+                    const status = typeof response != 'undefined' ? response.status : 500;
+
+                    switch(status)
+                    {
+                        case 401:
+                        case 422:
+                            this.resetErrors();
+                            return this.handleResponseErrors(data.errors);
+                            break;
+                        case 500:
+                        default:
+                            this.resetErrors();
+                            this.globalError = "An technical error has occoured. Please try again later";
+                            console.error(error);
+                    }
+                }
+            }
+
+            validate () {
+                //Reset errors, in case the user fixes some
+                this.resetErrors();
+
+                var hasErrors = false;
+
+                if(!this.email) {
+                    this.emailError = "Email address cannot be empty";
+                    hasErrors = true;
+                }
+                else if (!/.+@.+/.test(this.email))
+                {
+                    this.emailError = "Please enter a valid email address";
+                    hasErrors = true;
+                }
+
+
+                if(!this.password) {
+                    this.passwordError = "Enter a password";
+                    hasErrors = true;
+                }
+
+                if(!hasErrors) {
+                    //Reset errors since none was detected
+                    this.resetErrors();
+                    return true;
+                }
+
+                return false;
+            }
+
+            handleResponseErrors (errors) {
+                if(errors.email instanceof Array) {
+                    this.emailError = errors.email[0];
+                }
+            }
+
+            resetErrors () {
+                this.emailError = "";
+                this.passwordError = "";
+                this.globalError = "";
+            }
+
+            _onSignInButtonTap() {
+                this.submitLogin();
+            }
+
+            _onRegisterButtonTap () {
+                window.dispatchEvent(new CustomEvent('page-change', {
+                    detail: {
+                        page: 'register'
+                    }
+                }));
+            }
+
+            _onInputKeyup(evt)
+            {
+                switch(evt.key) {
+                    case "Enter":
+                        this.submitLogin();
+                        break;
+                }
+            }
+
+            _computeInvalid (msg) {
+                return msg != "";
+            }
+
+            _computeLoginButtonText (loading) {
+                return loading ? "Loading..." : "Sign In";
+            }
+
+            _computeDisabled(offline, loading) {
+                return offline || loading;
+            }
+        }
+
+        window.customElements.define(AuthViewLogin.is, AuthViewLogin);
+    </script>
+</dom-module>

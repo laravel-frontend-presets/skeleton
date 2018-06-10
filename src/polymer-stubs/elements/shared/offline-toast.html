@@ -1,0 +1,50 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="offline-toast">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .offline-toast {
+                right: 0;
+                left: auto !important;
+                font-size: 16px;
+            }
+        </style>
+
+        <paper-toast class="offline-toast" text="This app now works in offline mode" opened="[[offline]]" duration="0"></paper-toast>
+    </template>
+
+    <script>
+        class OfflineToast extends Polymer.Element {
+            static get is() { return 'offline-toast'; }
+
+            static get properties() {
+                return {
+                    offline: {
+                        type: Boolean,
+                        value: function() {
+                            return !navigator.onLine;
+                        }
+                    },
+                }
+            }
+
+            constructor() {
+                super();
+
+                window.addEventListener('online',  this._onlineChanged.bind(this));
+                window.addEventListener('offline', this._onlineChanged.bind(this));
+            }
+
+            _onlineChanged(evt) {
+                this.offline = !navigator.onLine;
+            }
+        }
+
+        window.customElements.define(OfflineToast.is, OfflineToast);
+    </script>
+</dom-module>

@@ -1,20 +1,26 @@
 {
-    "name": "laravel-frontend-presets/skeleton",
-    "description": "Laravel 5.5.x Front-end preset for skeleton",
-    "keywords": ["laravel", "preset", "skeleton"],
+    "name": "jlndk/laravel-polymer-webpack-frontend-preset",
+    "description": "Laravel 5.5.X Front-end preset for Polymer 2.x using webpack.",
+    "keywords": ["laravel", "preset", "polymer", "webpack"],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonas Lindenskov Nielsen",
+            "email": "jonas@jonasln.dk"
+        }
+    ],
     "require": {
-        "laravel/framework": "5.5.*"
+        "laravel/framework": ">=5.5"
     },
     "autoload": {
         "psr-4": {
-            "LaravelFrontendPresets\\SkeletonPreset\\": "src/"
+            "Jlndk\\PolymerWebpackPreset\\": "src/"
         }
     },
     "extra": {
       "laravel": {
         "providers": [
-          "LaravelFrontendPresets\\SkeletonPreset\\SkeletonPresetServiceProvider"
+          "Jlndk\\PolymerWebpackPreset\\PolymerPresetServiceProvider"
        ]
       }
     }
