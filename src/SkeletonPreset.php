@@ -1,10 +1,12 @@
 <?php
 namespace LaravelFrontendPresets\SkeletonPreset;
 
-use Artisan;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Console\Presets\Preset;
+use Laravel\Ui\Presets\Preset;
+use Symfony\Component\Finder\SplFileInfo;
 
 class SkeletonPreset extends Preset
 {
@@ -13,22 +15,25 @@ class SkeletonPreset extends Preset
      *
      * @return void
      */
-    public static function install($withAuth = false)
+    public static function install()
     {
-        static::updatePackages();
-        static::updateSass(); // or static::updateLess()
-        static::updateBootstrapping();
+       static::updatePackages();
+       static::updateStyles();
+       static::updateBootstrapping();
+       static::updateWelcomePage();
+       // static::updatePagination();
+       static::removeNodeModules();
+    }
 
-        if($withAuth)
-        {
-            static::addAuthTemplates(); // optional
-        }
-        else
-        {
-            static::updateWelcomePage(); //optional
-        }
-
-        static::removeNodeModules();
+    /**
+     * Install the preset with auth routes.
+     *
+     * @return void
+     */
+    public static function installAuth()
+    {
+       static::scaffoldController();
+       static::scaffoldAuth();
     }
 
     /**
@@ -42,7 +47,7 @@ class SkeletonPreset extends Preset
         // packages to add to the package.json
         $packagesToAdd = ['package-name' => '^version'];
         // packages to remove from the package.json
-        $packagesToRemove = ['package-name' => '^version'];
+        $packagesToRemove = ['package-name'];
         return $packagesToAdd + Arr::except($packages, $packagesToRemove);
     }
 
@@ -51,18 +56,19 @@ class SkeletonPreset extends Preset
      *
      * @return void
      */
-    protected static function updateSass()
+    protected static function updateStyles()
     {
-        // clean up all the files in the sass folder
-        $orphan_sass_files = glob(resource_path('/assets/sass/*.*'));
+        tap(new Filesystem, function ($filesystem) {
+            $filesystem->deleteDirectory(resource_path('sass'));
+            $filesystem->delete(public_path('js/app.js'));
+            $filesystem->delete(public_path('css/app.css'));
 
-        foreach($orphan_sass_files as $sass_file)
-        {
-            (new Filesystem)->delete($sass_file);
-        }
+            if (! $filesystem->isDirectory($directory = resource_path('css'))) {
+                $filesystem->makeDirectory($directory, 0755, true);
+            }
 
-        // copy files from the stubs folder
-        copy(__DIR__.'/skeleton-stubs/app.scss', resource_path('assets/sass/app.scss'));
+            $filesystem->copyDirectory(__DIR__.'/skeleton-stubs/resources/sass', resource_path('sass'));
+        });
     }
 
     /**
@@ -72,13 +78,7 @@ class SkeletonPreset extends Preset
      */
     protected static function updateBootstrapping()
     {
-        // remove exisiting bootstrap.js file
-        (new Filesystem)->delete(
-            resource_path('assets/js/bootstrap.js')
-        );
-
-        // copy a new bootstrap.js file from your stubs folder
-        copy(__DIR__.'/skeleton-stubs/bootstrap.js', resource_path('assets/js/bootstrap.js'));
+        copy(__DIR__.'/skeleton-stubs/resources/js/bootstrap.js', resource_path('js/bootstrap.js'));
     }
 
     /**
@@ -94,24 +94,66 @@ class SkeletonPreset extends Preset
         );
 
         // copy new one from your stubs folder
-        copy(__DIR__.'/skeleton-stubs/views/welcome.blade.php', resource_path('views/welcome.blade.php'));
+        copy(__DIR__.'/skeleton-stubs/resources/views/welcome.blade.php', resource_path('views/welcome.blade.php'));
     }
 
     /**
-     * Copy Auth view templates.
+     * Scaffold Auth controllers into project.
      *
      * @return void
      */
-    protected static function addAuthTemplates()
+    protected static function scaffoldController()
     {
-        // Add Home controller
-        copy(__DIR__.'/stubs-stubs/Controllers/HomeController.php', app_path('Http/Controllers/HomeController.php'));
+        if (! is_dir($directory = app_path('Http/Controllers/Auth'))) {
+            mkdir($directory, 0755, true);
+        }
 
-        // Add Auth routes in 'routes/web.php'
-        $auth_route_entry = "Auth::routes();\n\nRoute::get('/home', 'HomeController@index')->name('home');\n\n";
-        file_put_contents('./routes/web.php', $auth_route_entry, FILE_APPEND);
+        $filesystem = new Filesystem;
 
-        // Copy Skeleton auth views from the stubs folder
-        (new Filesystem)->copyDirectory(__DIR__.'/foundation-stubs/views', resource_path('views'));
+        collect($filesystem->allFiles(base_path('vendor/laravel/ui/stubs/Auth')))
+            ->each(function (SplFileInfo $file) use ($filesystem) {
+                $filesystem->copy(
+                    $file->getPathname(),
+                    app_path('Http/Controllers/Auth/'.Str::replaceLast('.stub', '.php', $file->getFilename()))
+                );
+            });
+    }
+
+    /**
+     * Scaffold Auth views into project.
+     *
+     * @return void
+     */
+    protected static function scaffoldAuth()
+    {
+        file_put_contents(app_path('Http/Controllers/HomeController.php'), static::compileControllerStub());
+
+        file_put_contents(
+            base_path('routes/web.php'),
+            "Auth::routes();\n\nRoute::get('/home', 'HomeController@index')->name('home');\n\n",
+            FILE_APPEND
+        );
+
+        tap(new Filesystem, function ($filesystem) {
+            $filesystem->copyDirectory(__DIR__.'/skeleton-stubs/resources/views', resource_path('views'));
+
+            collect($filesystem->allFiles(base_path('vendor/laravel/ui/stubs/migrations')))
+                ->each(function (SplFileInfo $file) use ($filesystem) {
+                    $filesystem->copy(
+                        $file->getPathname(),
+                        database_path('migrations/'.$file->getFilename())
+                    );
+                });
+        });
+    }
+
+
+    protected static function compileControllerStub()
+    {
+        return str_replace(
+            '{{namespace}}',
+            Container::getInstance()->getNamespace(),
+            file_get_contents(__DIR__.'/skeleton-stubs/controllers/HomeController.stub')
+        );
     }
 }
