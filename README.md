@@ -1,6 +1,6 @@
 Use this repo as a skeleton for your new preset, once you're done please open an issue on [this repo](https://github.com/laravel-frontend-presets/internals).
 
-Here's the latest documentation on Laravel 5.5:
+Here's the latest documentation on Laravel 7.x:
 
 https://laravel.com/docs/master/
 
