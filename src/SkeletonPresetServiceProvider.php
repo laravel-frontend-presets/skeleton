@@ -14,14 +14,16 @@ class SkeletonPresetServiceProvider extends ServiceProvider
     public function boot()
     {
         UiCommand::macro('skeleton', function ($command) {
-            SkeletonPreset::install(false);
-            $command->info('Skeleton scaffolding installed successfully.');
-            $command->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
-        });
+            SkeletonPreset::install();
 
-        UiCommand::macro('skeleton-auth', function ($command) { //optional
-            SkeletonPreset::install(true);
-            $command->info('Skeleton scaffolding with Auth views installed successfully.');
+            $command->info('Skeleton scaffolding installed successfully.');
+
+            if ($command->option('auth')) {
+                SkeletonPreset::installAuth();
+
+                $command->info('Skeleton auth scaffolding installed successfully.');
+            }
+
             $command->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
         });
     }
